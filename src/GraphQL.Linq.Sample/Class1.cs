@@ -21,7 +21,18 @@ namespace GraphQL.Linq.Sample
         public LinqQueryStaticBuilder<R> Select<R>(Func<T, R> selector) => default;
         public T Execute() => default;
 
+        public LinqQueryFragmentStaticBuilder<F> Fragment<F>() => default;
+
+        public LinqQueryStaticBuilder<T> Operation(string operationName) => default;
+
+        public LinqQueryStaticBuilder<R> Operation<T1, R>(string operationName, Func<T1, LinqQueryStaticBuilder<R>> builder) => default;
+
         public static ICompiledLinqQuery<T, R> GetCompiledQuery<R>(Func<LinqQueryStaticBuilder<T>, LinqQueryStaticBuilder<R>> builder) => default;
+    }
+
+    class LinqQueryFragmentStaticBuilder<T>
+    {
+        public Func<T, R> Select<R>(Func<T, R> selector) => default;
     }
 
     interface ISampleNode

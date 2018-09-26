@@ -75,5 +75,47 @@ namespace GraphQL.Linq.Sample
                 }
             };
         }
+
+        void Fragments()
+        {
+            var query =
+                from q in source
+                let comparisonFields = from f in source.Fragment<Character>() select new {
+                    f.Name,
+                    f.AppearsIn,
+                    Friends = from friend in f.Friends select new {
+                        friend.Name
+                    }
+                }
+                select new {
+                    LeftComparison = comparisonFields(q.Hero(Episode.Empire)),
+                    RightComparison = comparisonFields(q.Hero(Episode.Jedi))
+                };
+        }
+
+        void OperationName()
+        {
+            var query = from q in source.Operation("HeroNameAndFriends") select new {
+                Hero = from hero in q.Hero() select new {
+                    hero.Name,
+                    Friends = from friend in hero.Friends select new {
+                        friend.Name
+                    }
+                }
+            };
+        }
+
+        void Variables()
+        {
+            var query = source.Operation("HeroNameAndFriends",
+                (Episode episode) => from q in source select new {
+                    Hero = from hero in q.Hero(episode) select new {
+                        hero.Name,
+                        Friends = from friend in hero.Friends select new {
+                            friend.Name
+                        }
+                    }
+                });
+        }
     }
 }
