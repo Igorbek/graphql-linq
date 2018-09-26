@@ -322,8 +322,6 @@ from q in source select new {
 
 ## Fragments
 
-TODO
-
 ```graphql
 {
   leftComparison: hero(episode: EMPIRE) {
@@ -343,9 +341,24 @@ fragment comparisonFields on Character {
 }
 ```
 
-## Operation name
+```cs
+from q in source
+let comparisonFields = from f in source.Fragment<Character>() select new {
+    f.Name,
+    f.AppearsIn,
+    Friends = from friend in f.Friends select new {
+        friend.Name
+    }
+}
+select new {
+    LeftComparison = comparisonFields(q.Hero(Episode.Empire)),
+    RightComparison = comparisonFields(q.Hero(Episode.Jedi))
+}
+```
 
-TODO
+> **Note** API for getting a fragment may be different. For example a static `QueryBuilder.Fragment<TFragment>()`.
+
+## Operation name
 
 ```graphql
 query HeroNameAndFriends {
@@ -358,9 +371,18 @@ query HeroNameAndFriends {
 }
 ```
 
-## Variables
+```cs
+from q in source.Operation("HeroNameAndFriends") select new {
+    Hero = from hero in q.Hero() select new {
+        hero.Name,
+        Friends = from friend in hero.Friends select new {
+            friend.Name
+        }
+    }
+}
+```
 
-TODO
+## Variables
 
 ```graphql
 query HeroNameAndFriends($episode: Episode) {
@@ -371,6 +393,19 @@ query HeroNameAndFriends($episode: Episode) {
     }
   }
 }
+```
+
+```cs
+source.Operation("HeroNameAndFriends",
+    (Episode episode) => from q in source select new {
+        Hero = from hero in q.Hero(episode) select new {
+            hero.Name,
+            Friends = from friend in hero.Friends select new {
+                friend.Name
+            }
+        }
+    }
+)
 ```
 
 ### Default values
